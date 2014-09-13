@@ -64,27 +64,29 @@ cat > /etc/update-motd.d/00-header <<'DONE'
 #!/bin/bash
 
 GREEN='\e[0;32m'
-BLUE='\e[0;34m'
 LBLUE='\e[1;34m'
 RESET='\e[0m'
 echo -e "
-${LBLUE}WELCOME TO MINECRAFT!${RESET}
-${BLUE}
+${LBLUE}WELCOME TO MINECRAFT!$
+
 To stop, start, restart or check the status of the the minecraft server
 process, simply run:${RESET}
 ${GREEN}
   $ service minecraft <stop|start|restart|status>${RESET}
-${BLUE}
+${LBLUE}
 The runtime logs are available at /opt/minecraft/logs
 
 To change the min or max server memory values, make the change in:${RESET}
 ${GREEN}
   /etc/init/minecraft.conf${RESET}
-${BLUE}
+${LBLUE}
 And then restart the server proces.
 
-Have fun!${RESET}
-"
+Status of minecraft server:${RESET}
+
+${GREEN}$(service minecraft status)${RESET}
+
+${LBLUE}Have fun!${RESET}"
 DONE
 
 chmod +x /etc/update-motd.d/00-header
