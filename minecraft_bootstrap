@@ -1,0 +1,91 @@
+#!/bin/bash
+set -e
+
+# Minecraft server quick-installer
+#
+#         Stephen Wood
+#     www.heystephenwood.com
+
+# Some default variables to get the ball started
+VERSION='https://s3.amazonaws.com/Minecraft.Download/versions/1.8/minecraft_server.1.8.jar'
+WORK_DIR='/opt/minecraft'
+
+# The only required package is openjdk-6
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y --no-install-recommends openjdk-6-jre-headless
+
+# We want to save persistent files, so we'll symlink over that directory
+ln -s /vagrant/persistent_files ${WORK_DIR}
+test -d ${WORK_DIR}/logs || mkdir -p ${WORK_DIR}/logs
+pushd ${WORK_DIR}
+
+# Download the jar if it doesn't already exist
+test -f "${VERSION}" || wget --quiet "${VERSION}"
+
+# Upstart manages the server process
+cat > /etc/init/minecraft.conf <<MINECRAFT_CONF
+# Minecraft upstart script
+
+start on (local-filesystems and net-device-up IFACE!=lo)
+stop on [!12345]
+
+respawn
+
+chdir ${WORK_DIR}
+
+exec java -Xmx1024M -Xms1024M -jar minecraft_server.1.8.jar nogui > /opt/minecraft/logs/service.log 2>&1
+MINECRAFT_CONF
+
+# A logrotate script to keep the minecraft server log from getting too large
+cat > /etc/logrotate.d/minecraft <<MINECRAFT_LOGROTATE
+${WORK_DIR}/logs/service.log {
+  rotate 24
+  weekly
+  compress
+  notifempty
+  copytruncate
+}
+MINECRAFT_LOGROTATE
+
+# Always accept the eula
+cat > ${WORK_DIR}/eula.txt <<EULA
+# By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).
+eula=TRUE
+EULA
+
+initctl reload-configuration
+service minecraft start
+
+# Delete the useless vagrant MOTD and install our own
+rm /etc/motd.tail
+rm /etc/update-motd.d/*
+cat > /etc/update-motd.d/00-header <<'DONE'
+#!/bin/bash
+
+GREEN='\e[0;32m'
+BLUE='\e[0;34m'
+LBLUE='\e[1;34m'
+RESET='\e[0m'
+echo -e "
+${LBLUE}WELCOME TO MINECRAFT!${RESET}
+${BLUE}
+To stop, start, restart or check the status of the the minecraft server
+process, simply run:${RESET}
+${GREEN}
+  $ service minecraft <stop|start|restart|status>${RESET}
+${BLUE}
+The runtime logs are available at /opt/minecraft/logs
+
+To change the min or max server memory values, make the change in:${RESET}
+${GREEN}
+  /etc/init/minecraft.conf${RESET}
+${BLUE}
+And then restart the server proces.
+
+Have fun!${RESET}
+"
+DONE
+
+chmod +x /etc/update-motd.d/00-header
+chmod 755 /etc/update-motd.d/00-header
