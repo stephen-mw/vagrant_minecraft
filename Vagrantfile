@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Vagrant setup for minecraft servers. For use with virtualbox
+
 # If you plan on making your server accessible on your network, you may need
 # to change this device name (works for macbooks)
 $BRIDGE_DEVICE = 'en0: Wi-Fi (AirPort)'
