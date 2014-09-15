@@ -21,7 +21,8 @@ test -d ${WORK_DIR}/logs || mkdir -p ${WORK_DIR}/logs
 pushd ${WORK_DIR}
 
 # Download the jar if it doesn't already exist
-test -f "${VERSION}" || wget --quiet "${VERSION}"
+HEADER='Referer: https://github.com/stephendotexe/vagrant_minecraft_auto_launch'
+test -f "${VERSION}" || wget --header=${HEADER} --quiet "${VERSION}"
 
 # Upstart manages the server process
 cat > /etc/init/minecraft.conf <<MINECRAFT_CONF
@@ -67,7 +68,7 @@ GREEN='\e[0;32m'
 LBLUE='\e[1;34m'
 RESET='\e[0m'
 echo -e "
-${LBLUE}WELCOME TO MINECRAFT!$
+${LBLUE}WELCOME TO MINECRAFT!
 
 To stop, start, restart or check the status of the the minecraft server
 process, simply run:${RESET}
