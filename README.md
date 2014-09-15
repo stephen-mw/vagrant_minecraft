@@ -21,7 +21,7 @@ First install Vagrant if you haven't already done that.
 
 Next clone the repo:
 ```
-git clone git@github.com:stephendotexe/vagrant_minecraft_auto_launch.git
+git clone git@github.com:stephen-mw/vagrant_minecraft_auto_launch.git
 ```
 
 Pop into the vagrant server and run ```vagrant up```
