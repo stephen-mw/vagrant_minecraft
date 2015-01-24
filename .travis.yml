@@ -1,0 +1,1 @@
+script: sudo ./minecraft_bootstrap travis

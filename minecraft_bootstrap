@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
+set -x
+
+# For testing builds
+TRAVIS=$1
 
 # Minecraft server quick-installer
 #
-#         Stephen Wood
-#     www.heystephenwood.com
+# Stephen Wood
+# www.heystephenwood.com
+# https://github.com/stephen-mw/vagrant_minecraft
 
 # Some default variables to get the ball started
 VERSION='https://s3.amazonaws.com/Minecraft.Download/versions/1.8/minecraft_server.1.8.jar'
@@ -16,7 +21,10 @@ apt-get update -y
 apt-get install -y --no-install-recommends openjdk-6-jre-headless
 
 # We want to save persistent files, so we'll symlink over that directory
-ln -s /vagrant/persistent_files ${WORK_DIR}
+if [[ -z "${TRAVIS}" ]]; then
+  ln -s /vagrant/persistent_files ${WORK_DIR}
+fi
+
 test -d ${WORK_DIR}/logs || mkdir -p ${WORK_DIR}/logs
 pushd ${WORK_DIR}
 
@@ -59,8 +67,8 @@ initctl reload-configuration
 service minecraft start
 
 # Delete the useless vagrant MOTD and install our own
-rm /etc/motd.tail
-rm /etc/update-motd.d/*
+test -f /etc/motd.tail && rm /etc/motd.tail
+test -f /etc/update-motd.d/* && rm -r -- /etc/update-motd.d/*
 cat > /etc/update-motd.d/00-header <<'DONE'
 #!/bin/bash
 
