@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/stephen-mw/vagrant_minecraft.svg?branch=master)](https://travis-ci.org/stephen-mw/vagrant_minecraft)
 
 # Disposable Minecraft Servers
-Minecraft is a game where you run around punching blocks and building stuff with your imagination, basically like legos for boys and girls born in the 21st century.
 
 Vagrant is a virtualization service for creating disposable dev environments. Now the two of them are together for running easy, shareable minecraft servers.
 
